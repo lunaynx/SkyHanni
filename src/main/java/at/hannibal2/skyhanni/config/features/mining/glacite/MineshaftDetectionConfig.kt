@@ -47,5 +47,6 @@ class MineshaftDetectionConfig {
     val mineshaftsToTrack: MutableList<MineshaftDetection.MineshaftType> = mutableListOf(
         MineshaftDetection.MineshaftType.FAIR_1,
         MineshaftDetection.MineshaftType.JASP_1,
+        MineshaftDetection.MineshaftType.LITT_L,
     )
 }

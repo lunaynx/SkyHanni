@@ -162,7 +162,8 @@ object MineshaftDetection {
         JASP_1(LorenzColor.LIGHT_PURPLE, "Jasper"),
         JASP_C(LorenzColor.LIGHT_PURPLE, "Jasper Crystal"),
         OPAL_1(LorenzColor.WHITE, "Opal"),
-        OPAL_C(LorenzColor.WHITE, "Opal Crystal")
+        OPAL_C(LorenzColor.WHITE, "Opal Crystal"),
+        LITT_L(LorenzColor.AQUA, "Littlefoot")
         ;
 
         val displayName: String = color.getChatColor() + rawName
@@ -190,6 +191,12 @@ object MineshaftDetection {
             "#profile.mining.mineshaft.lastMineshaftTime",
             "#profile.mining.mineshaft.lastMineshaftTimeNew",
         ) { transformElementMap(it) }
+        event.transform(130, "mining.glaciteMineshaft.mineshaftDetectionConfig.mineshaftsToTrack") { element ->
+            val list = element.asJsonArray
+            val newEntry = JsonPrimitive("LITT_L")
+            if (!list.contains(newEntry)) list.add(newEntry)
+            list
+        }
     }
 
     private fun transformElementMap(originalElement: JsonElement): JsonObject {
