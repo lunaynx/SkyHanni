@@ -156,18 +156,16 @@ object CarnivalZombieShootout {
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @HandleEvent(ServerBlockChangeEvent::class)
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
 
-        val blockOld = event.old
-        val blockNew = event.new
-        if (blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
-            val old = event.oldState.getValue(BlockStateProperties.LIT)
-            val new = event.newState.getValue(BlockStateProperties.LIT)
+        if (event.old == Blocks.REDSTONE_LAMP && event.new == Blocks.REDSTONE_LAMP) {
+            val oldLit = event.oldState.getValue(BlockStateProperties.LIT)
+            val newLit = event.newState.getValue(BlockStateProperties.LIT)
             lamp = when {
-                !old && new -> ShootoutLamp(event.location, SimpleTimeMark.now())
-                old && !new -> null
+                !oldLit && newLit -> ShootoutLamp(event.location, SimpleTimeMark.now())
+                oldLit && !newLit -> null
                 else -> lamp
             }
         }

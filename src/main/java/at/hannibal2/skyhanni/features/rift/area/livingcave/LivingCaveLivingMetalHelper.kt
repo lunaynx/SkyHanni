@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,11 +31,8 @@ object LivingCaveLivingMetalHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType == ClickType.LEFT_CLICK) {
-            val name = event.getBlockState.block.toString()
-            if (name.contains("lapis_ore")) {
-                lastClicked = event.position
-            }
+        if (event.clickType == ClickType.LEFT_CLICK && event.blockState.block == Blocks.LAPIS_ORE) {
+            lastClicked = event.position
         }
     }
 
@@ -44,7 +42,7 @@ object LivingCaveLivingMetalHelper {
         val location = event.location
         if (location.distanceToPlayer() >= 7) return
 
-        if (event.old == "lapis_ore") {
+        if (event.old == Blocks.LAPIS_ORE) {
             pair?.let {
                 if (it.second == location) {
                     pair = null
@@ -52,7 +50,7 @@ object LivingCaveLivingMetalHelper {
             }
         }
 
-        if (event.new != "lapis_ore") return
+        if (event.new != Blocks.LAPIS_ORE) return
 
         lastClicked?.let {
             val distance = location.distance(it)

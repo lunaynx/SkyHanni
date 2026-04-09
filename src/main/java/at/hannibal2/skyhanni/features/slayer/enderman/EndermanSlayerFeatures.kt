@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -212,7 +212,7 @@ object EndermanSlayerFeatures {
         if (!showBeacon()) return
 
         val location = event.location
-        if (event.new == "beacon") {
+        if (event.new == Blocks.BEACON) {
             val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
             if (armorStand != null) {
                 flyingBeacons.remove(armorStand)

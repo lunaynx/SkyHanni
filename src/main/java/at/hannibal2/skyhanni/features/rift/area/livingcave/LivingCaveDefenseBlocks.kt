@@ -25,6 +25,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.StainedGlassBlock
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
@@ -114,7 +116,7 @@ object LivingCaveDefenseBlocks {
         val new = event.new
 
         // spawn block
-        if (old == "air" && (new == "stained_glass" || new == "diamond_block")) {
+        if (old == Blocks.AIR && (new is StainedGlassBlock || new == Blocks.DIAMOND_BLOCK)) {
             val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
             staticBlocks = staticBlocks.editCopy {
                 add(DefenseBlock(entity, location))
