@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -46,12 +46,14 @@ object PowderChestTimer {
 
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
+    private const val MAX_CHEST_DISTANCE = 15
+    private const val NEAR_PLAYER_DISTANCE = 25
+
+    private val maxDuration = 60.seconds
+
     private var display: Renderable? = null
     private val minedBlocks = TimeLimitedSet<LorenzVec>(5.seconds)
     private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
-    private val maxDuration = 60.seconds
-    private const val MAX_CHEST_DISTANCE = 15
-    private const val NEAR_PLAYER_DISTANCE = 25
     private var lastSound = SimpleTimeMark.farPast()
 
     private val arePlayersNearby by RecalculatingValue(5.seconds) {
@@ -76,25 +78,25 @@ object PowderChestTimer {
     fun onWorldChange() = chests.clear()
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onServerBlockChange(event: ServerBlockChangeEvent) {
+    fun onBlockChange(event: ServerBlockChangeEvent) {
         val location = event.location
         if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
 
         when {
-            event.oldState.`is`(Blocks.STONE) && event.newState.`is`(Blocks.AIR) -> {
+            event.old == Blocks.STONE && event.new == Blocks.AIR -> {
                 minedBlocks.add(location)
             }
 
-            !event.oldState.`is`(Blocks.CHEST) && event.newState.`is`(Blocks.CHEST) -> {
+            event.old != Blocks.CHEST && event.new == Blocks.CHEST -> {
                 val mined = minedBlocks.remove(location)
-                val possibleFalsePositive = arePlayersNearby || (!mined && event.oldState.`is`(Blocks.AIR))
+                val possibleFalsePositive = arePlayersNearby || (!mined && event.old == Blocks.AIR)
 
                 if (possibleFalsePositive && lastSound.passedSince() > 200.milliseconds) return
 
                 chests[location] = maxDuration.fromNow()
             }
 
-            event.oldState.`is`(Blocks.CHEST) && !event.newState.`is`(Blocks.CHEST) -> {
+            event.old == Blocks.CHEST && event.new != Blocks.CHEST -> {
                 chests.remove(location)
             }
         }
@@ -105,7 +107,7 @@ object PowderChestTimer {
         if (!isEnabled()) return
 
         val location = event.position
-        if (!location.getBlockStateAt().`is`(Blocks.CHEST)) return
+        if (location.getBlockAt() != Blocks.CHEST) return
 
         if (HotmData.GREAT_EXPLORER.activeLevel < 20) return
 
@@ -205,14 +207,13 @@ object PowderChestTimer {
         }
     }
 
-    private fun Color.toChatColor(): String {
-        return when {
-            red in 0..127 && green in 127..255 -> "§a"
-            red in 127..212 && green in 42..127 -> "§6"
-            red in 212..230 && green in 25..42 -> "§c"
-            red in 230..255 && green in 0..25 -> "§4"
-            else -> "§f"
-        }
+    @Suppress("IntroduceWhenSubject")
+    private fun Color.toChatColor() = when {
+        red in 0..127 && green in 127..255 -> "§a"
+        red in 127..212 && green in 42..127 -> "§6"
+        red in 212..230 && green in 25..42 -> "§c"
+        red in 230..255 && green in 0..25 -> "§4"
+        else -> "§f"
     }
 
     private fun Duration.getColorBasedOnTime(): Color {
