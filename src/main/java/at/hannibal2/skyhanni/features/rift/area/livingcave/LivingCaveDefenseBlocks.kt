@@ -129,7 +129,7 @@ object LivingCaveDefenseBlocks {
 
         // despawn block
         val nearestBlock = getNearestStaticDefenseBlock(location)
-        if (new == "air" && location == nearestBlock?.location) {
+        if (new == Blocks.AIR && location == nearestBlock?.location) {
             staticBlocks = staticBlocks.editCopy { remove(nearestBlock) }
         }
     }
