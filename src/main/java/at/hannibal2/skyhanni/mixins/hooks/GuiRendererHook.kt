@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager.isChroma
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
@@ -69,7 +71,7 @@ object GuiRendererHook {
         if (state is GlyphRenderState) {
             val drawnGlyph = state.renderable as? GlyphInstance ?: return original.call(state)
             val glyphColor = drawnGlyph.style.color
-            if (glyphColor != null && glyphColor.name == "chroma") {
+            if (glyphColor != null && glyphColor.isChroma()) {
                 return SkyHanniRenderPipeline.CHROMA_TEXT.invoke()
             }
         }

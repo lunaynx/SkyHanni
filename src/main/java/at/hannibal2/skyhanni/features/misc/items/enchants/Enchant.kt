@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -75,7 +76,7 @@ open class Enchant : Comparable<Enchant> {
 
         var style = if (colorProperty.get() is LorenzColor) {
             if (colorProperty.get() == LorenzColor.CHROMA)
-                Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
+                Style.EMPTY.withColor(ChromaFontManager.chromaTextColor)
             else
                 Style.EMPTY.withColor(TextColor.fromRgb((colorProperty.get() as LorenzColor).toColor().rgb))
         } else {
@@ -115,7 +116,7 @@ open class Enchant : Comparable<Enchant> {
                             withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
                         } else {
                             if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
-                                withColor(TextColor(0xFFFFFF, "chroma"))
+                                withColor(ChromaFontManager.chromaTextColor)
                             else
                                 withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
                         }
@@ -146,7 +147,7 @@ open class Enchant : Comparable<Enchant> {
                 Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
             } else {
                 if (config.ultimateEnchantColor.get() == LorenzColor.CHROMA)
-                    Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
+                    Style.EMPTY.withColor(ChromaFontManager.chromaTextColor).withBold(true)
                 else
                     Style.EMPTY.withColor(config.ultimateEnchantColor.get().toColor().rgb).withBold(true)
             }

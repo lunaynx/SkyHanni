@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.features.achievements.AchievementManager
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.compat.append
@@ -69,7 +69,7 @@ object ContributorManager {
             componentBuilder {
                 append("Be in the same lobby as a")
                 append(" SkyHanni ") {
-                    withColor(TextHelper.chromaStyle)
+                    withColor(ChromaFontManager.chromaTextColor)
                 }
                 append("contributor")
             }

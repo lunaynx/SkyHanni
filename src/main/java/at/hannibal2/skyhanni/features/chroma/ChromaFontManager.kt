@@ -5,61 +5,80 @@ import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 
-var renderingChat: Boolean = false
-private val textColor = TextColor(0xFFFFFF, "chroma")
-private val textColorOffWhite = TextColor(0xFFFFFE, "chroma")
-var glyphIsChroma = false
-// Unicode private use area character used to preview SkyHanni's chroma,
-// avoids the 'z' color code to stop other mods styling our preview text.
-const val CHROMA_PREVIEW_COLOR_CODE = '\uE002'
+object ChromaFontManager {
+    private const val CHROMA_COLOR_NAME = "skyhanni_chroma"
 
-fun checkIfGlyphIsChroma(drawnGlyph: GlyphInstance) {
-    if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return
-    val colorName = drawnGlyph.style.color?.name
+    // Unicode private use area character used to preview SkyHanni's chroma,
+    // avoids the 'z' color code to stop other mods styling our preview text.
+    const val CHROMA_PREVIEW_COLOR_CODE = '\uE002'
 
-    glyphIsChroma = colorName == "chroma"
-}
+    /**
+     * Chroma [TextColor] object meant for general use.
+     */
+    val chromaTextColor by lazy { TextColor(0xFFFFFF, CHROMA_COLOR_NAME) }
 
-fun setChromaColorStyle(style: Style, text: String, colorCode: Char): Style {
-    if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
-    if (colorCode.lowercaseChar() == 'z' || colorCode == CHROMA_PREVIEW_COLOR_CODE) {
-        return Style.EMPTY.withColor(textColor)
+    /**
+     * This is only to be used internally for the "Everything Chroma" feature.
+     */
+    private val allChromaTextColor by lazy { TextColor(0xFFFFFE, CHROMA_COLOR_NAME) }
+
+    @JvmStatic
+    var renderingChat = false
+
+    @JvmStatic
+    var glyphIsChroma = false
+        private set
+
+    fun TextColor.isChroma() = name == CHROMA_COLOR_NAME
+
+    @JvmStatic
+    fun checkIfGlyphIsChroma(drawnGlyph: GlyphInstance) {
+        if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return
+        val colorName = drawnGlyph.style.color?.name
+
+        glyphIsChroma = colorName == CHROMA_COLOR_NAME
     }
-    return style
-}
 
-fun forceWhiteTextColorForChroma(color: TextColor?): TextColor? {
-    if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return color
-
-    val allChroma = SkyHanniMod.feature.gui.chroma.allChroma
-    val chatFlag = SkyHanniMod.feature.gui.chroma.ignoreChat && renderingChat
-
-    if (allChroma && !chatFlag) {
-        return textColor
+    @JvmStatic
+    fun setChromaColorStyle(style: Style, colorCode: Char): Style {
+        if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
+        if (colorCode.lowercaseChar() == 'z' || colorCode == CHROMA_PREVIEW_COLOR_CODE) {
+            return Style.EMPTY.withColor(chromaTextColor)
+        }
+        return style
     }
-    return color
-}
 
-fun forceChromaStyleIfNecessary(style: Style): Style {
-    if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
+    @JvmStatic
+    fun forceWhiteTextColorForChroma(color: TextColor?): TextColor? {
+        if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return color
 
-    val allChroma = SkyHanniMod.feature.gui.chroma.allChroma
-    val chatFlag = SkyHanniMod.feature.gui.chroma.ignoreChat && renderingChat
+        val allChroma = SkyHanniMod.feature.gui.chroma.allChroma
+        val chatFlag = SkyHanniMod.feature.gui.chroma.ignoreChat && renderingChat
 
-    if (allChroma && !chatFlag) {
-        return style.withColor(textColorOffWhite)
+        if (allChroma && !chatFlag) {
+            return chromaTextColor
+        }
+        return color
     }
-    return style
-}
 
-fun isNotActuallyEqualBecauseOfChroma(
-    textColor: TextColor,
-    testObject: Any,
-): Boolean = testObject is TextColor &&
-    (textColor.name == "chroma" || testObject.name == "chroma") &&
-    textColor.getTextColorName() != testObject.getTextColorName()
+    @JvmStatic
+    fun forceChromaStyleIfNecessary(style: Style): Style {
+        if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
 
-// the get name inside of text color does a string format and is very bad for performance
-private fun TextColor.getTextColorName(): String? {
-    return if (name != null) name else value.toString()
+        val allChroma = SkyHanniMod.feature.gui.chroma.allChroma
+        val chatFlag = SkyHanniMod.feature.gui.chroma.ignoreChat && renderingChat
+
+        if (allChroma && !chatFlag) {
+            return style.withColor(allChromaTextColor)
+        }
+        return style
+    }
+
+    @JvmStatic
+    fun isNotActuallyEqualBecauseOfChroma(
+        textColor: TextColor,
+        testObject: Any,
+    ): Boolean = testObject is TextColor &&
+        (textColor.isChroma() || testObject.isChroma()) &&
+        (textColor.name != testObject.name || textColor.value != testObject.value)
 }

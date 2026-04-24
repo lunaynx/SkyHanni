@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager.isChroma
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Style
@@ -70,7 +71,7 @@ object OrderedTextUtils {
         if (((from.color != to.color) && to.color != null) || (reset && to.color != null)) {
             if (!exclusive) sb.append(ChatFormatting.RESET.toString())
 
-            if (to.color?.name == "chroma") {
+            if (to.color?.isChroma() == true) {
                 sb.append("§z")
             } else {
 

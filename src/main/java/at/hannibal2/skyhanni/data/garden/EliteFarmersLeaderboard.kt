@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.achievements.AchievementManager
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -36,7 +37,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
@@ -547,7 +547,7 @@ object EliteFarmersLeaderboard {
             componentBuilder {
                 append("Pass one of the")
                 append(" SkyHanni ") {
-                    withColor(TextHelper.chromaStyle)
+                    withColor(ChromaFontManager.chromaTextColor)
                 }
                 append("contributors in the farming leaderboards")
             }
