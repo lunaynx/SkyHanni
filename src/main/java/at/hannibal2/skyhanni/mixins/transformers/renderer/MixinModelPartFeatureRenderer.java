@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
+import at.hannibal2.skyhanni.compat.IrisCompat;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.utils.render.NoOpVertexConsumer;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -15,7 +17,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ModelPartFeatureRenderer.class)
-public class MixinModelPartFeatureRenderer {
+public abstract class MixinModelPartFeatureRenderer {
 
     @WrapOperation(
         method = "render",
@@ -28,6 +30,7 @@ public class MixinModelPartFeatureRenderer {
         @Local SubmitNodeStorage.ModelPartSubmit modelPart
     ) {
         if (skyhanni$usesCustomOutline(modelPart)) {
+            if (IrisCompat.isRenderingShadowPass()) return;
             original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), color);
         } else {
             original.call(outlineConsumer, color);
@@ -48,6 +51,7 @@ public class MixinModelPartFeatureRenderer {
         @Local SubmitNodeStorage.ModelPartSubmit modelPart
     ) {
         if (skyhanni$usesCustomOutline(modelPart)) {
+            if (IrisCompat.isRenderingShadowPass()) return NoOpVertexConsumer.INSTANCE;
             return original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), layer);
         } else {
             return original.call(outlineConsumer, layer);

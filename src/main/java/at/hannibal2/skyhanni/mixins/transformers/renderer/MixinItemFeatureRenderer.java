@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
+import at.hannibal2.skyhanni.compat.IrisCompat;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.utils.render.NoOpVertexConsumer;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -14,12 +16,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ItemFeatureRenderer.class)
-public class MixinItemFeatureRenderer {
+public abstract class MixinItemFeatureRenderer {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
     private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            if (IrisCompat.isRenderingShadowPass()) return;
             original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), i);
         } else {
             original.call(outlineConsumer, i);
@@ -30,6 +33,7 @@ public class MixinItemFeatureRenderer {
     private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            if (IrisCompat.isRenderingShadowPass()) return renderType -> NoOpVertexConsumer.INSTANCE;
             return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
         } else {
             return outlineConsumer;

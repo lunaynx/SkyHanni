@@ -17,6 +17,14 @@ object IrisCompat {
 
     private val isIrisLoaded by lazy { PlatformUtils.isModInstalled("iris") }
     private val irisProgramEnum by lazy { Class.forName(IRIS_PROGRAM_PATH) }
+    private val irisInstance by lazy {
+        if (!isIrisLoaded) null else runCatching {
+            Class.forName(IRIS_API_PATH).getMethod("getInstance").invoke(null)
+        }.getOrNull()
+    }
+    private val isRenderingShadowPassMethod by lazy {
+        runCatching { irisInstance?.javaClass?.getMethod("isRenderingShadowPass") }.getOrNull()
+    }
 
     enum class IrisProgram {
         BASIC,
@@ -55,5 +63,13 @@ object IrisCompat {
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception, "Failed to initialize Iris compat!")
         }
+    }
+
+    @JvmStatic
+    fun isRenderingShadowPass(): Boolean {
+        if (!isIrisLoaded) return false
+        val instance = irisInstance ?: return false
+        val method = isRenderingShadowPassMethod ?: return false
+        return runCatching { method.invoke(instance) == true }.getOrDefault(false)
     }
 }
