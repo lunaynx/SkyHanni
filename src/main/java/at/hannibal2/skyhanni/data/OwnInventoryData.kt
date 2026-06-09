@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -37,6 +38,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object OwnInventoryData {
 
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
+
     private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
 
@@ -68,15 +71,15 @@ object OwnInventoryData {
                     when (slot) {
                         in 0..4 -> {} // crafting output+grid
                         in 5..8 -> { // armor
-                            ChatUtils.debug("OwnInventoryArmorUpdateEvent: $slot - $item - $internalName")
+                            debug("OwnInventoryArmorUpdateEvent: $slot - $item - $internalName")
                             OwnInventoryArmorUpdateEvent(item, slot).post()
                         }
                         in 9..43 -> { // normal items
-                            ChatUtils.debug("OwnInventoryItemUpdateEvent: $slot - $item - $internalName")
+                            debug("OwnInventoryItemUpdateEvent: $slot - $item - $internalName")
                             OwnInventoryItemUpdateEvent(item, slot).post()
                         }
                         44 -> { // skyblock menu
-                            ChatUtils.debug("OwnInventoryMenuUpdateEvent: $slot - $item - $internalName")
+                            debug("OwnInventoryMenuUpdateEvent: $slot - $item - $internalName")
                             OwnInventoryMenuUpdateEvent(item).post()
                         }
                         45 -> {} // offhand
@@ -229,5 +232,9 @@ object OwnInventoryData {
         if (internalName.startsWith("MAP-")) return
 
         ItemAddInInventoryEvent(internalName, add).post()
+    }
+
+    private fun debug(message: String) {
+        if (debugConfig.inventoryDebug) ChatUtils.debug(message)
     }
 }

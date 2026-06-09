@@ -20,6 +20,11 @@ class DebugConfig {
     var enabled: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Inventory Debug", desc = "Enable more debug messages about inventory events")
+    @ConfigEditorBoolean
+    var inventoryDebug: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Command Logging",
         desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)",
