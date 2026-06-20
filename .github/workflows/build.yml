@@ -21,6 +21,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Build and test
         strategy:
+            fail-fast: false
             matrix:
                 minecraft_version:
                     - "1.21.11"
