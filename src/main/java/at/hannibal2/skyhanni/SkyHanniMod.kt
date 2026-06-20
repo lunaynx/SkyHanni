@@ -51,6 +51,9 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
+//? if < 26.2
+//asdf
+
 @SkyHanniModule
 object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     CoroutineScope(CoroutineName("SkyHanni") + SupervisorJob(Job(null))),
