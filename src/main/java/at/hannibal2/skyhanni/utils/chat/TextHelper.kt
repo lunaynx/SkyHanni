@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
@@ -135,52 +136,72 @@ object TextHelper {
         dividerColor: ChatFormatting = ChatFormatting.BLUE,
         formatter: (T) -> Component,
     ) {
-        val text = mutableListOf<Component>()
+        DelayedRun.runOrNextTick {
+            val text = mutableListOf<Component>()
 
-        val totalPages = (list.size + maxPerPage - 1) / maxPerPage
-        val page = if (totalPages == 0) 0 else currentPage
+            val totalPages = (list.size + maxPerPage - 1) / maxPerPage
+            val page = if (totalPages == 0) 0 else currentPage
 
-        text.add(createDivider(dividerColor))
-        text.add("§6$title".asComponent().center())
+            text.add(createDivider(dividerColor))
+            text.add("§6$title".asComponent().center())
 
-        if (totalPages > 1) {
-            text.add(
-                join(
-                    if (page > 1) "§6§l<<".asComponent {
-                        hover = "§eClick to view page ${page - 1}".asComponent()
-                        onClick {
-                            displayPaginatedList(title, list, chatLineId, emptyMessage, page - 1, maxPerPage, dividerColor, formatter)
-                        }
-                    } else null,
-                    " ",
-                    "§6(Page $page of $totalPages)",
-                    " ",
-                    if (page < totalPages) "§6§l>>".asComponent {
-                        hover = "§eClick to view page ${page + 1}".asComponent()
-                        onClick {
-                            displayPaginatedList(title, list, chatLineId, emptyMessage, page + 1, maxPerPage, dividerColor, formatter)
-                        }
-                    } else null,
-                ).center(),
-            )
-        }
-
-        text.add(createDivider(dividerColor))
-
-        if (list.isNotEmpty()) {
-            val start = (page - 1) * maxPerPage
-            val end = (page * maxPerPage).coerceAtMost(list.size)
-            for (i in start until end) {
-                text.add(formatter(list[i]))
+            if (totalPages > 1) {
+                text.add(
+                    join(
+                        if (page > 1) "§6§l<<".asComponent {
+                            hover = "§eClick to view page ${page - 1}".asComponent()
+                            onClick {
+                                displayPaginatedList(
+                                    title,
+                                    list,
+                                    chatLineId,
+                                    emptyMessage,
+                                    page - 1,
+                                    maxPerPage,
+                                    dividerColor,
+                                    formatter,
+                                )
+                            }
+                        } else null,
+                        " ",
+                        "§6(Page $page of $totalPages)",
+                        " ",
+                        if (page < totalPages) "§6§l>>".asComponent {
+                            hover = "§eClick to view page ${page + 1}".asComponent()
+                            onClick {
+                                displayPaginatedList(
+                                    title,
+                                    list,
+                                    chatLineId,
+                                    emptyMessage,
+                                    page + 1,
+                                    maxPerPage,
+                                    dividerColor,
+                                    formatter,
+                                )
+                            }
+                        } else null,
+                    ).center(),
+                )
             }
-        } else {
-            text.add(EMPTY)
-            text.add("§c$emptyMessage".asComponent().center())
-            text.add(EMPTY)
-        }
 
-        text.add(createDivider(dividerColor))
-        multiline(text).send(chatLineId)
+            text.add(createDivider(dividerColor))
+
+            if (list.isNotEmpty()) {
+                val start = (page - 1) * maxPerPage
+                val end = (page * maxPerPage).coerceAtMost(list.size)
+                for (i in start until end) {
+                    text.add(formatter(list[i]))
+                }
+            } else {
+                text.add(EMPTY)
+                text.add("§c$emptyMessage".asComponent().center())
+                text.add(EMPTY)
+            }
+
+            text.add(createDivider(dividerColor))
+            multiline(text).send(chatLineId)
+        }
     }
 
     fun createGradientText(start: LorenzColor, end: LorenzColor, string: String): Component {

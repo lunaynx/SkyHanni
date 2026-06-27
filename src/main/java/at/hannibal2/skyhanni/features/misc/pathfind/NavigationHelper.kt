@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -28,6 +29,12 @@ object NavigationHelper {
 
     private val messageId = ChatUtils.getUniqueMessageId()
 
+    private data class NavigationSearchResult(
+        val searchTerm: String,
+        val distances: Map<GraphNode, Double>,
+        val locations: List<Pair<String, GraphNode>>,
+    )
+
     val allowedTags = listOf(
         GraphNodeTag.NPC,
         GraphNodeTag.AREA,
@@ -40,12 +47,27 @@ object NavigationHelper {
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
+    private fun doCommand(searchTerm: String) {
+        displayCommandResult(createSearchResult(searchTerm))
+    }
+
     private fun doCommandAsync(searchTerm: String) {
+        val result = createSearchResult(searchTerm)
+        DelayedRun.runOrNextTick {
+            displayCommandResult(result)
+        }
+    }
+
+    private fun createSearchResult(searchTerm: String): NavigationSearchResult {
         val distances = calculateDistances(searchTerm)
         val locations = calculateNames(distances)
+        return NavigationSearchResult(searchTerm, distances, locations)
+    }
 
+    private fun displayCommandResult(result: NavigationSearchResult) {
+        val (searchTerm, distances, locations) = result
         val goBack = {
-            doCommandAsync(searchTerm)
+            doCommand(searchTerm)
             IslandGraphs.stopNavigation()
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
@@ -138,7 +160,7 @@ object NavigationHelper {
                 }
             }
             simpleCallback {
-                doCommandAsync("")
+                doCommand("")
             }
         }
     }
