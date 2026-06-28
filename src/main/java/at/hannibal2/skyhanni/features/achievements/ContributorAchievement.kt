@@ -51,8 +51,9 @@ object ContributorAchievement {
             Achievement(
                 "Notice Me Senpai".asComponent(),
                 componentBuilder {
-                    append("Have your friend request ignored by ")
+                    append("Have your friend request ignored by a ")
                     appendWithColor("SkyHanni", ChromaFontManager.chromaTextColor)
+                    append(" contributor")
                 }
             ),
             CONTRIBUTOR_NOBODY_ACHIEVEMENT
