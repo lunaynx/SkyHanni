@@ -58,7 +58,7 @@ object SoundUtils {
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
-        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/.:_-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
     }
 
@@ -94,7 +94,7 @@ object SoundUtils {
         event.registerBrigadier("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
             category = CommandCategory.DEVELOPER_TEST
-            arg("name", BrigadierArguments.string()) { soundName ->
+            arg("name", BrigadierArguments.nonWhitespaceString()) { soundName ->
                 arg("pitch", BrigadierArguments.float()) { pitch ->
                     arg("volume", BrigadierArguments.float()) { volume ->
                         callback {
