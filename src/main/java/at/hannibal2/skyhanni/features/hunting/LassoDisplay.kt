@@ -18,12 +18,14 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.world.entity.Leashable
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object LassoDisplay {
 
     private val config get() = SkyHanniMod.feature.hunting
+
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -34,33 +36,37 @@ object LassoDisplay {
         }
     }
 
-    // TODO: use entity events
+    // TODO use entity events
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!config.lassoDisplay) return
+
         var isReel = false
         var progressBar = ""
+
         if (InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.LASSO) {
             display = null
             return
         }
+
         for (entity in EntityUtils.getAllEntities()) {
-            if (entity !is net.minecraft.world.entity.Leashable) continue
-            val leashEntity = entity.leashHolder ?: continue
+            val leashEntity = (entity as? Leashable)?.leashHolder ?: continue
             if (!leashEntity.isLocalPlayer) continue
+
             val entitiesNearby = entity.blockPosition().toLorenzVec().up(2).getEntitiesNearby<ArmorStand>(2.0)
             for (armorStandEntity in entitiesNearby) {
                 val name = armorStandEntity.displayName.formattedTextCompat()
                 if (name.contains("§l§m")) {
                     progressBar = name
                 }
-                if (name.removeSuffix("§r") == "§e§lREEL") {
+                if (name.removeColor() == "REEL") {
                     isReel = true
                     break
                 }
             }
         }
+
         display = if (isReel) {
             Renderable.text("§e§l          REEL          ")
         } else if (progressBar.isNotEmpty()) {
@@ -69,7 +75,7 @@ object LassoDisplay {
     }
 
     @HandleEvent
-    fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(100, "foraging.lassoDisplay", "hunting.lassoDisplay")
         event.move(100, "foraging.lassoDisplayPosition", "hunting.lassoDisplayPosition")
     }

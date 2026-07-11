@@ -40,9 +40,11 @@ object NpcVisitorFix {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryOpen(event: InventoryOpenEvent) {
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
-        val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return
-        DelayedRun.runDelayed(200.milliseconds) {
-            saveStaticVisitor(name, nearest)
+        DelayedRun.runOrNextTick {
+            val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return@runOrNextTick
+            DelayedRun.runDelayed(200.milliseconds) {
+                saveStaticVisitor(name, nearest)
+            }
         }
     }
 

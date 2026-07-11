@@ -13,6 +13,7 @@ import net.minecraft.world.entity.monster.EnderMan
 @SkyHanniModule
 object EndermanSlayerHideParticles {
 
+    // TODO refactor to cache entity positions instead of calling getEntitiesInBoundingBox on the network thread
     @HandleEvent
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return

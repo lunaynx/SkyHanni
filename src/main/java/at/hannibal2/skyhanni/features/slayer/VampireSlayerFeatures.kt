@@ -325,11 +325,13 @@ object VampireSlayerFeatures {
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        for (boss in loc.getEntitiesNearby<RemotePlayer>(3.0)) {
-            if (!boss.isHighlighted() || event.type != ParticleTypes.ENCHANT) continue
-            for (ichor in event.location.getEntitiesNearby<ArmorStand>(3.0)) {
-                if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
-                    standList = standList.editCopy { this[ichor] = boss }
+        DelayedRun.runOrNextTick {
+            for (boss in loc.getEntitiesNearby<RemotePlayer>(3.0)) {
+                if (!boss.isHighlighted() || event.type != ParticleTypes.ENCHANT) continue
+                for (ichor in event.location.getEntitiesNearby<ArmorStand>(3.0)) {
+                    if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
+                        standList = standList.editCopy { this[ichor] = boss }
+                    }
                 }
             }
         }

@@ -29,12 +29,13 @@ import net.minecraft.world.entity.monster.MagmaCube
 
 @SkyHanniModule
 object HideFarEntities {
+
     private val config get() = SkyHanniMod.feature.misc.hideFarEntities
 
     private var ignored = emptySet<Int>()
     private var neverHide = emptySet<Int>()
 
-    // TODO: use entity events
+    // TODO use entity events
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -69,7 +70,7 @@ object HideFarEntities {
      * dungeon mini bosses: sa, frozen adventurer
      * 1b hp mob in dungeon
      */
-    // TODO: use entity events
+    // TODO use entity events
     @OptIn(AllEntitiesGetter::class)
     private fun updateNeverHide() {
         val list = mutableSetOf<Entity>()

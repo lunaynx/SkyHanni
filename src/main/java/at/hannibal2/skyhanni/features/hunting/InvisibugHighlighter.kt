@@ -40,12 +40,11 @@ object InvisibugHighlighter {
         if (invisibugEntities.any { it.distanceTo(event.location) < DISTANCE }) return
 
         val aabb = event.location.boundingCenter(DISTANCE)
-        val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox<ArmorStand>(aabb).minByOrNull { it.distanceTo(event.location) } ?: return
 
-        if (!nearestArmorStand.isCompletelyDefault()) return
-
-        DelayedRun.runOrNextTick { invisibugEntities.add(nearestArmorStand) }
-
+        DelayedRun.runOrNextTick {
+            val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox<ArmorStand>(aabb).minByOrNull { it.distanceTo(event.location) } ?: return
+            if (nearestArmorStand.isCompletelyDefault()) invisibugEntities.add(nearestArmorStand)
+        }
     }
 
     private val renderOffset = LorenzVec(0.4, -0.2, 0.4)

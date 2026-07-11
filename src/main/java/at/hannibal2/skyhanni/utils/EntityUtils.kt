@@ -188,27 +188,43 @@ object EntityUtils {
         return getEntitiesInBoundingBox(pos.boundingCenter(radius), predicate)
     }
 
-    // More efficient than filtering by type, and then for distance, as Minecraft already first filters the chunks that contain the aabb,
-    // and then filters both for entity type and with the predicate for entities inside those chunks.
-    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
-        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return world.getEntitiesOfClass(E::class.java, aabb, predicate)
+    /**
+     * Gets entities in the specified bounding box, with an optional predicate.
+     *
+     * This is more eefficient than filtering by type, and then for distance, as Minecraft already
+     * first filters the chunks that contain the AABB, and then filters both for entity type and
+     * with the predicate for entities inside those chunks.
+     */
+    inline fun <reified E : Entity> getEntitiesInBoundingBox(
+        aabb: AABB,
+        noinline predicate: (E) -> Boolean = ALWAYS,
+    ): Sequence<E> {
+        // TODO eliminate non-render thread uses
+        // check(Minecraft.getInstance().isSameThread) { "getEntitiesInBoundingBox called from wrong thread" }
+        val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
+        return world.getEntitiesOfClass(E::class.java, aabb, predicate).toList().asSequence()
     }
 
+    /**
+     * Gets all entities in the world.
+     *
+     * Avoid using this outside tightly scoped paths where it makes sense, such as config reloads.
+     *
+     * Must be called from the render thread.
+     */
     @AllEntitiesGetter
-    fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.entitiesForRendering()?.let {
-        if (Minecraft.getInstance().isSameThread) it
-        // TODO: while I am here, I want to point out that copying the entity list does not constitute proper synchronization,
-        //  but *does* make crashes because of it rarer.
-        else it.toMutableList()
-    }?.asSequence().orEmpty()
+    fun getAllEntities(): Sequence<Entity> {
+        // TODO eliminate non-render thread uses
+        // check(Minecraft.getInstance().isSameThread) { "getAllEntities called from wrong thread" }
+        val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
+        return world.entitiesForRendering().toList().asSequence()
+    }
 
     fun getAllTileEntities(): Sequence<BlockEntity> {
+        // TODO eliminate non-render thread uses
+        // check(Minecraft.getInstance().isSameThread) { "getAllTileEntities called from wrong thread" }
         val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
-        val blockEntityTickers = world.blockEntityTickers.let {
-            if (Minecraft.getInstance().isSameThread) it else it.toMutableList()
-        }.asSequence()
-
+        val blockEntityTickers = world.blockEntityTickers.toList().asSequence()
         return blockEntityTickers.mapNotNull { invoker -> world.getBlockEntity(invoker.pos) }
     }
 

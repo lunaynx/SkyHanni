@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBos
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -93,7 +94,7 @@ object CrimsonMinibossRespawnTimer {
         update()
     }
 
-    private fun updateArea() {
+    private fun updateArea() = DelayedRun.runOrNextTick {
         MiniBoss.entries.forEach {
             if (it.lastSeenArea.passedSince() > 2.minutes) {
                 it.nextSpawnTime = null
