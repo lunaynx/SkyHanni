@@ -1,5 +1,5 @@
 <h1 align="center">
-  SkyHanni: Mod for Hypixel SkyBlock
+  MeowHanni: Mod for Hypixel SkyBlock
 </h1>
 
 
