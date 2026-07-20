@@ -9,8 +9,16 @@ import org.spongepowered.asm.mixin.MixinEnvironment
 object MixinAuditGameTest : FabricClientGameTest {
 
     override fun runTest(context: ClientGameTestContext) {
+        val environment = MixinEnvironment.getCurrentEnvironment()
+
+        println("===== BEGIN MIXIN OPTIONS =====")
+        MixinEnvironment.Option.entries.forEach { option ->
+            println("${option.name} = ${environment.getOption(option)}")
+        }
+        println("===== END MIXIN OPTIONS =====")
+
         context.worldBuilder().create().use {
-            MixinEnvironment.getCurrentEnvironment().audit()
+            environment.audit()
         }
     }
 }
