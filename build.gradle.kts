@@ -83,7 +83,6 @@ loom.apply {
             isIdeConfigGenerated = true
             appendProjectPathToConfigName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
-            property("mixin.debug", "true")
             property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             vmArgs("-Xmx4G", "-Dnarrator.none=true")
             programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
