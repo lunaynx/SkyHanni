@@ -342,6 +342,7 @@ tasks.named<Test>("test") {
 
 loom.runs.named("clientGameTest") {
     isIdeConfigGenerated = false
+    property("mixin.debug", "false")
 }
 
 if (target == primaryTarget) {
