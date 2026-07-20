@@ -7,6 +7,7 @@ import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
+import net.fabricmc.loom.task.RunGameTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.gradle.api.provider.Provider
@@ -83,9 +84,7 @@ loom.apply {
             appendProjectPathToConfigName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
             property("mixin.debug", "true")
-            if (System.getenv("repo_action") != "true") {
-                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
-            }
+            property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             vmArgs("-Xmx4G", "-Dnarrator.none=true")
             programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
@@ -281,6 +280,13 @@ tasks.withType<Test> {
     )
 }
 
+val buildUnitTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Runs the unit test suite without client game tests."
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+}
+
 kotlin {
     sourceSets.all {
         languageSettings {
@@ -311,16 +317,38 @@ tasks.processResources {
 }
 
 @Suppress("UnstableApiUsage")
-if (target == primaryTarget) {
-    configure<FabricApiExtension> {
-        configureTests {
-            modId = "skyhanni"
-            enableGameTests = false // Server game tests
-            enableClientGameTests = true
-            eula = true
-        }
+configure<FabricApiExtension> {
+    configureTests {
+        createSourceSet = true
+        modId = "skyhanni-gametest"
+        enableGameTests = false // Server game tests
+        enableClientGameTests = true
+        eula = true
     }
-    tasks.register("generateRepoPatterns", ClientProductionRunTask::class.java).configure {
+}
+
+val gameTestsUseXvfb = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
+
+tasks.named<RunGameTask>("runClientGameTest") {
+    outputs.upToDateWhen { false }
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    jvmArgs("-Ddevauth.enabled=false")
+    useXvfb.set(gameTestsUseXvfb)
+    if (!gameTestsUseXvfb) jvmArgs("-DSkyHanniGameTest.minimizeWindow=true")
+}
+
+tasks.named<Test>("test") {
+    dependsOn(tasks.named("runClientGameTest"))
+}
+
+loom.runs.named("clientGameTest") {
+    isIdeConfigGenerated = false
+}
+
+if (target == primaryTarget) {
+    tasks.register<ClientProductionRunTask>("generateRepoPatterns").configure {
+        // Repo patterns must be regenerated every time this task is invoked.
+        outputs.upToDateWhen { false }
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
@@ -328,9 +356,10 @@ if (target == primaryTarget) {
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
-        useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
+        jvmArgs.add("-Ddevauth.enabled=false")
+        useXVFB = gameTestsUseXvfb
+        if (!gameTestsUseXvfb) jvmArgs.add("-DSkyHanniGameTest.minimizeWindow=true")
     }
-    loom.runs.removeIf { it.name == "clientGameTest" }
 }
 
 fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
@@ -464,12 +493,15 @@ detekt {
 // Detekt is handled by a dedicated CI workflow; exclude it from the check/build lifecycle
 // so it doesn't slow down normal builds. It still runs when invoked explicitly.
 afterEvaluate {
-    tasks.findByName("check")?.setDependsOn(
-        tasks.getByName("check").dependsOn.filterNot { dep ->
-            (dep is Task && dep.name.startsWith("detekt")) ||
-                (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
-        }
-    )
+    tasks.findByName("check")?.let { check ->
+        check.setDependsOn(
+            check.dependsOn.filterNot { dep ->
+                val dependencyName = (dep as? Named)?.name ?: dep as? String
+                dependencyName == "test" || dependencyName?.startsWith("detekt") == true
+            }
+        )
+        check.dependsOn(buildUnitTest)
+    }
 }
 
 tasks.withType<Detekt>().configureEach {

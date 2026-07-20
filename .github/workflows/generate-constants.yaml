@@ -5,7 +5,6 @@ name: RepoPattern
 
 env:
     data_repo: hannibal002/SkyHanni-REPO
-    repo_action: true
 
 on:
     push:

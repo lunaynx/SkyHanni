@@ -1,0 +1,22 @@
+{
+    "schemaVersion": 1,
+    "id": "skyhanni-gametest",
+    "version": "1.0.0",
+    "name": "SkyHanni Game Tests",
+    "environment": "client",
+    "entrypoints": {
+        "fabric-client-gametest": [
+            {
+                "adapter": "kotlin",
+                "value": "at.hannibal2.skyhanni.test.MixinAuditGameTest"
+            }
+        ]
+    },
+    "depends": {
+        "fabric-api": "*",
+        "fabric-language-kotlin": "*",
+        "fabricloader": "*",
+        "minecraft": "*",
+        "skyhanni": "*"
+    }
+}

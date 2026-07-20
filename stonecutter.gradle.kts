@@ -129,6 +129,12 @@ stonecutter handlers {
     }
 }
 
+stonecutter tasks {
+    order("prodClient")
+    order("runClient")
+    order("runClientGameTest")
+}
+
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.1") {
