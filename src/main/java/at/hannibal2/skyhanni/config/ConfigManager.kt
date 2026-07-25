@@ -43,19 +43,27 @@ import java.io.IOException
 import java.lang.reflect.Field
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class ConfigManager {
     companion object {
         val gson: Gson = BaseGsonBuilder.gson().create()
         val configDirectory = File("config/skyhanni")
+
+        private val QUEUED_SAVE_INTERVAL = 5.seconds
+        private val FEATURE_AUTO_SAVE_INTERVAL = 60.seconds
     }
 
     private val logger = SkyHanniLogger("config_manager")
 
     private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
+
+    private val queuedSaves: MutableMap<ConfigFileType, String> = ConcurrentHashMap()
+    private var lastFeatureAutoSave = SimpleTimeMark.farPast()
 
     lateinit var processor: BlockingMoulConfigProcessor
     private var disableSaving = false
@@ -79,9 +87,19 @@ class ConfigManager {
             setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, clazzInstance))
         }
 
+        lastFeatureAutoSave = SimpleTimeMark.now()
         // TODO use SecondPassedEvent
-        fixedRateTimer(name = "skyhanni-config-auto-save", daemon = true, period = 60_000L, initialDelay = 60_000L) {
-            saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
+        fixedRateTimer(
+            name = "skyhanni-config-auto-save",
+            daemon = true,
+            period = QUEUED_SAVE_INTERVAL.inWholeMilliseconds,
+            initialDelay = QUEUED_SAVE_INTERVAL.inWholeMilliseconds,
+        ) {
+            if (lastFeatureAutoSave.passedSince() >= FEATURE_AUTO_SAVE_INTERVAL) {
+                lastFeatureAutoSave = SimpleTimeMark.now()
+                queueSave(ConfigFileType.FEATURES, "auto-save-60s")
+            }
+            flushQueuedSaves()
         }
 
         val features = SkyHanniMod.feature
@@ -205,9 +223,28 @@ class ConfigManager {
     }
 
     fun saveConfig(fileType: ConfigFileType, reason: String) {
+        queuedSaves.remove(fileType)
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
         saveFile(fileType.file, fileType.fileName, json, reason)
         saveFile(fileType.backupFile, fileType.fileName, json, reason)
+    }
+
+    /**
+     * Marks [fileType] as dirty instead of writing it to disk right away. Repeated calls collapse into a single
+     * write done by the auto save timer thread, at most once every [QUEUED_SAVE_INTERVAL].
+     *
+     * Use this over [saveConfig] for data that changes frequently, as writing a config file takes long enough
+     * to cause a noticeable lag spike when done on the client thread.
+     */
+    fun queueSave(fileType: ConfigFileType, reason: String) {
+        queuedSaves[fileType] = reason
+    }
+
+    fun flushQueuedSaves() {
+        for (fileType in ConfigFileType.entries) {
+            val reason = queuedSaves[fileType] ?: continue
+            saveConfig(fileType, reason)
+        }
     }
 
     private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
