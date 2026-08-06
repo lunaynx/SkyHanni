@@ -82,7 +82,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (config.zombieTimer) event.renderZombieTimer()
@@ -151,14 +151,14 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
 
         if (event.old == Blocks.REDSTONE_LAMP && event.new == Blocks.REDSTONE_LAMP) {
@@ -173,7 +173,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
@@ -186,7 +186,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !event.isMod(2)) return
 
         if (config.coloredHitboxes || config.zombieTimer) {

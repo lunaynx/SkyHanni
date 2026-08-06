@@ -61,7 +61,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
             if (config.muteChestDiscover) event.cancel()
@@ -74,17 +74,17 @@ object PowderChestTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
     }
 
     @HandleEvent
-    fun onWorldChange() = chests.clear()
+    private fun onWorldChange() = chests.clear()
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         val location = event.location
         if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
 
@@ -109,7 +109,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
         val location = event.position
@@ -125,7 +125,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
 
         // TODO why in god's name is this calculating onTick 🥺
@@ -150,7 +150,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val chests = chests.takeIf { it.isNotEmpty() }?.toMap() ?: return
 
