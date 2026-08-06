@@ -610,6 +610,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added line to Tarantula Boss. - SillyGirlMarina (https://github.com/hannibal002/SkyHanni/pull/5392)
 + Added Egg Sac highlight during the Tarantula Broodfather boss fight. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5919)
 + Added line to Voidgloom Seraph boss. - Marina (https://github.com/hannibal002/SkyHanni/pull/5669)
++ Added No Gummy Warning. - PuppyGirlAbora (https://github.com/hannibal002/SkyHanni/pull/5871)
+    + Added a warning when killing mobs without a Re-Heated Gummy Polar Bear active.
 
 </details>
 <details open><summary>
@@ -1209,6 +1211,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added some whisper cost and spent info to HOTF perk tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4754)
 + Added Mute Fusion Machine. - Luna (https://github.com/hannibal002/SkyHanni/pull/5196)
 + Added tracker, titles, and block highlighting for Dark Monoliths. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4062)
++ Added Honeyhive Reminder. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6280)
+    + Reminds you that you can collect the Honey Hives in Torrhus Canyon and navigates you to all of them.
+
+### Safari
+
++ Added Hideyho Finder. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6284)
+    + Helps you find Hideyho by navigating to all of its possible hiding locations.
++ Added Safari Names in Center. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6261)
+    + Shows the names of the 4 areas while in the center of the Critter Safari.
+    + This works identically to the Names in Core feature in Crystal Hollows.
 
 </details>
 <details open><summary>
@@ -1905,6 +1917,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show the future legendary pet Oringo will offer in the Calendar.
 + Added Deployable Reminder. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5886)
     + A reminder to place down your power orb for Slayer, umbrella for Trophy Fishing, and lantern for Mineshafts.
++ Re-added the old Glowing Dropped Items feature for the items Hypixel doesn't glow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5758)
+    + This does not glow them through walls, unlike the old feature.
++ Added /shnavall. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6251)
+    + Navigate to all occurrences of a target on an island.
+    + May be useful for new points of interest on Honey Hives (Torrhus Canyon), and the Bells and Hideyho (Safari).
 
 </details>
 <details open><summary>
