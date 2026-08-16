@@ -55,7 +55,7 @@ value class NeuInternalName private constructor(private val internalName: String
 
     val isPet: Boolean
         get() = petCache.getOrPut(this) {
-            PetUtils.isKnownPetInternalName(this) || (getItemCategoryOrNull() == ItemCategory.PET)
+            PetUtils.isKnownPetInternalName(this) || (getItemCategoryOrNull() == PET)
         }
 
     private val isEnchantedBook: Boolean
