@@ -23,12 +23,12 @@ class HypixelItemApi {
         private var prices = mapOf<NeuInternalName, Double>()
         private var npcPrices = mapOf<NeuInternalName, Double>()
         private var georgePrices = mapOf<NeuInternalName, Double>()
-        private var minionStorageXp = mapOf<NeuInternalName, Map<String, Double>>()
+        private var minionStorageXP = mapOf<NeuInternalName, Map<String, Double>>()
 
         fun getNpcPrice(internalName: NeuInternalName) = prices[internalName]
 
-        fun getMinionStorageXp(internalName: NeuInternalName): Map<String, Double>? =
-            minionStorageXp[internalName]
+        fun getMinionStorageXP(internalName: NeuInternalName): Map<String, Double>? =
+            minionStorageXP[internalName]
 
         @HandleEvent
         private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
@@ -41,7 +41,7 @@ class HypixelItemApi {
             val npcPrices = mutableMapOf<NeuInternalName, Double>()
             val motesPrice = mutableMapOf<NeuInternalName, Double>()
             val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
-            val minionStorageXp = mutableMapOf<NeuInternalName, Map<String, Double>>()
+            val minionStorageXP = mutableMapOf<NeuInternalName, Map<String, Double>>()
             for (item in itemsData.items) {
                 val neuItemId = NeuItems.transHypixelNameToInternalName(item.id ?: continue)
                 item.npcPrice?.let { npcPrices[neuItemId] = it }
@@ -49,12 +49,12 @@ class HypixelItemApi {
                 item.stats?.let { stats -> allStats[neuItemId] = stats }
                 item.experience?.mapNotNull { (skill, experience) ->
                     experience.minionStorage?.let { skill to it }
-                }?.toMap()?.takeIf { it.isNotEmpty() }?.let { minionStorageXp[neuItemId] = it }
+                }?.toMap()?.takeIf { it.isNotEmpty() }?.let { minionStorageXP[neuItemId] = it }
             }
             ItemUtils.updateBaseStats(allStats)
             RiftApi.motesPrice = motesPrice
             HypixelItemApi.npcPrices = npcPrices
-            HypixelItemApi.minionStorageXp = minionStorageXp
+            HypixelItemApi.minionStorageXP = minionStorageXP
             prices = georgePrices + npcPrices
         }
     }

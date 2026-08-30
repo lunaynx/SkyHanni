@@ -19,17 +19,17 @@ class HypixelItemApiTest {
 
         assertEquals(
             mapOf("fishing" to 20480.0),
-            HypixelItemApi.getMinionStorageXp("CONDENSED_WATER_LILY".toInternalName()),
+            HypixelItemApi.getMinionStorageXP("CONDENSED_WATER_LILY".toInternalName()),
         )
-        assertNull(HypixelItemApi.getMinionStorageXp("NO_EXPERIENCE".toInternalName()))
-        assertNull(HypixelItemApi.getMinionStorageXp("NO_MINION_STORAGE".toInternalName()))
+        assertNull(HypixelItemApi.getMinionStorageXP("NO_EXPERIENCE".toInternalName()))
+        assertNull(HypixelItemApi.getMinionStorageXP("NO_MINION_STORAGE".toInternalName()))
         assertEquals(
             mapOf("farming" to 2.0, "mining" to 3.0),
-            HypixelItemApi.getMinionStorageXp("MULTI_SKILL".toInternalName()),
+            HypixelItemApi.getMinionStorageXP("MULTI_SKILL".toInternalName()),
         )
         assertEquals(
             mapOf("mystery" to 4.0),
-            HypixelItemApi.getMinionStorageXp("UNKNOWN_SKILL".toInternalName()),
+            HypixelItemApi.getMinionStorageXP("UNKNOWN_SKILL".toInternalName()),
         )
     }
 
@@ -40,7 +40,7 @@ class HypixelItemApiTest {
                 MinionXP.XPInfo(SkillType.FARMING, 6.0),
                 MinionXP.XPInfo(SkillType.MINING, 9.0),
             ),
-            MinionXP.calculateXpInfo(
+            MinionXP.calculateXPInfo(
                 mapOf("farming" to 2.0, "mining" to 3.0, "mystery" to 4.0),
                 itemAmount = 2,
                 multiplier = 1.5,

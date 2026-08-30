@@ -97,9 +97,9 @@ object MinionXP {
             .map { toPrimitiveItemStack(it) }
         for (item in list) {
             val name = item.internalName
-            val minionStorageXp = HypixelItemApi.getMinionStorageXp(name) ?: continue
+            val minionStorageXP = HypixelItemApi.getMinionStorageXP(name) ?: continue
             val multiplier = if (Perk.MOAR_SKILLZ.isActive) 1.5 else 1.0
-            val xpInfo = calculateXpInfo(minionStorageXp, item.amount, multiplier)
+            val xpInfo = calculateXPInfo(minionStorageXP, item.amount, multiplier)
 
             xpItemMap[item] = xpInfo.map { collectMessage(it.type, it.amount) }
             for (xp in xpInfo) {
@@ -110,11 +110,11 @@ object MinionXP {
     }
 
     // TODO add wisdom and temporary skill exp (Events) to calculation
-    internal fun calculateXpInfo(
-        minionStorageXp: Map<String, Double>,
+    internal fun calculateXPInfo(
+        minionStorageXP: Map<String, Double>,
         itemAmount: Int,
         multiplier: Double,
-    ): List<XPInfo> = minionStorageXp.mapNotNull { (skillName, amount) ->
+    ): List<XPInfo> = minionStorageXP.mapNotNull { (skillName, amount) ->
         SkillType.getByNameOrNull(skillName)?.let { XPInfo(it, amount * itemAmount * multiplier) }
     }
 
