@@ -221,9 +221,8 @@ object WorldRenderUtils {
             true,
             seeThroughBlocks = seeThroughBlocks,
         )
-        // todo use seeThroughBlocks
+        // TODO use seeThroughBlocks
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(location.x, location.y + 1, location.z, color.rgb)
-
     }
 
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
