@@ -104,7 +104,10 @@ object NeuItems {
         if (allInternalNames.isNotEmpty()) DelayedRun.runOrNextTick(::readAllNeuItems)
     }
 
-    @HandleEvent
+    // The priority is set to HIGHEST to make sure we run before other event handlers - especially SkyblockCurrency,
+    // which also calls DelayedRun.runNextTick and would otherwise schedule its task before us, which may lead to
+    // false positive "different repo item" errors.
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onNeuRepoReload() {
         multiplierCache.clear()
         itemIdCache.clear()
